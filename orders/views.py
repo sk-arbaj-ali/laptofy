@@ -44,7 +44,7 @@ def handle_address(request):
         # if there is no product in cart then it doesn't make sence
         # to select address so redirect to cart with a message
         if not Cart.objects.filter(user=get_user(request)):
-            return redirect(f'{reverse('current-added-products')}?cart=false')
+            return redirect(f"{reverse('current-added-products')}?cart=false")
         
         queryset = Address.objects.filter(user=get_user(request))
     if request.method == 'POST':
