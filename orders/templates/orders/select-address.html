@@ -1,0 +1,62 @@
+{% extends 'base/base.html' %}
+
+{% block style %}
+<style>
+    input:checked + label {
+	border-color: black;
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+</style>
+{% endblock style %}
+
+{% block content %}
+
+<div class="flex flex-col items-center justify-center w-screen h-screen">
+    <header>
+        <h2>Select Delivery Address</h2>
+    </header>
+    <hr>
+    {% if addresses %}
+	<!-- Component Start -->
+	<!-- <form class="grid grid-cols-3 gap-2 w-full max-w-screen-sm"> -->
+	<form class="max-w-screen-sm" action="{% url 'select-address' %}" method="post">
+        {% csrf_token %}
+        {% for address in addresses %}
+		<div class="my-3">
+			<input class="hidden" id="radio-{{address.id}}" type="radio" name="address" value="{{address.id}}">
+			<label class="flex flex-col p-4 border-2 border-gray-400 cursor-pointer" for="radio-{{address.id}}">
+				<span class="text-xl font-semibold uppercase">{{address.city}}</span>
+				<span class="text-xl font-bold mt-2">{{address.street}}</span>
+				<ul class="text-sm mt-2">
+					<li>{{address.pincode}}</li>
+					<li>{{address.phone}}</li>
+				</ul>
+			</label>
+		</div>
+        {% endfor %}
+        <button
+            class="border border-indigo-500 bg-indigo-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-indigo-600 focus:outline-none focus:shadow-outline">
+            Select Address
+        </button>
+	</form>
+	<!-- Component End  -->
+    {% else %}
+     <h2>No address available. Please provide an address.</h2>
+    {% endif %}
+
+</div>
+<div class="flex flex-col items-center">
+    <header>
+        <h2>Want to add new address?</h2>
+        <a href="{% url 'create-new-address' %}" class="flex text-indigo-700 border border-indigo-600 py-2 px-6 gap-2 rounded items-center">
+            <span>
+                Add Address
+            </span>
+            <svg class="w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                viewBox="0 0 24 24" class="w-6 h-6 ml-2">
+                <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+        </a>
+    </header>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce Store</title>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    {% block style %}
+    {% endblock style %}
+</head>
+<body>
+    {% include 'base/navbar.html' %}
+    {% block content %}
+
+    {% endblock %}
+    
+    {% include 'base/footer.html' %}
+
+    {% comment %}
+    <!-- <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/flowbite@1.4.1/dist/flowbite.js"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+                colors: {
+                    primary: {
+                    DEFAULT: '#3B82F6',
+                    50: '#f5f3ff',
+                    100: '#e0e7ff',
+                    200: '#ddd6fe',
+                    300: '#c4b5fd',
+                    400: '#a78bfa',
+                    500: '#8b5cf6',
+                    600: '#7c3aed',
+                    700: '#6d28d9',
+                    800: '#5b21b6',
+                    900: '#4c1d95'
+                    }
+                }
+            }
+          }
+        }
+    </script> -->
+    {% endcomment %}
+    {% block script %}
+    {% endblock %}
+    <script src="https://unpkg.com/flowbite@1.4.1/dist/flowbite.js"></script>
+</body>
+</html>

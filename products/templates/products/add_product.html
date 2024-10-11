@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<form action="" method="POST" class="md:col-span-8 p-10" enctype="multipart/form-data">
+    <div class="flex flex-col items-center -mx-3 mb-6" id="form-container">
+    {% csrf_token %}
+    {% for field in productForm %}
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                for="{{ field.id_for_label }}">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            {{ field.errors }}
+            
+        </div>
+    {% endfor %}
+
+    <div id="main-select-container" class="flex flex-wrap justify-center">
+        <div class="flex flex-col select-div my-3 mx-2" id="select-container">
+            {% for field in productColorAndSizeForm %}
+                {{ field.label_tag }}
+                <div>
+                    {{ field }}
+                    {{ field.help_text }}
+                </div>
+                {{ field.errors }}
+            {% endfor %}
+        </div>
+
+        {% for form in valid_color_and_size_form_list %}
+            <div class="flex flex-col select-div my-3" id="select-container">
+                {% for field in form %}
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        {% for form in error_color_and_size_form_list %}
+            <div class="flex flex-col select-div my-3" id="select-container">
+                {% for field in form %}
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                {% endfor %}
+                <p class="text-red-600">The above color, size and prices have not been added.</p>
+            </div>
+        {% endfor %}
+
+    </div>
+    <button class="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded my-5" id="btn-add">ADD Color and Size</button>
+    <button
+        class="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded"
+        type="submit">
+        Add Product
+    </button>
+    </div>
+</form>
+
+<div class="flex justify-center">
+    <p><a class="shadow bg-teal-600 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded mx-5" href="{% url 'add-category' %}">Add Category</a></p>
+    <p><a class="shadow bg-teal-600 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded mx-5" href="{% url 'add-sub-category' %}">Add SubCategory</a></p>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    let form_div = document.querySelector('#form-container');
+    let main_select_div = document.querySelector('#main-select-container');
+    let select_div = document.querySelector('#select-container');
+    let btn = document.querySelector('#btn-add');
+
+    btn.addEventListener('click', function(e){
+        e.preventDefault();
+        main_select_div.appendChild(select_div.cloneNode(true));
+    });
+
+</script>
+{% endblock %}

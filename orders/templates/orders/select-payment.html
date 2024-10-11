@@ -1,0 +1,37 @@
+{% extends 'base/base.html' %}
+
+{% block style %}
+<style>
+    input:checked + label {
+	border-color: black;
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+</style>
+{% endblock style %}
+
+{% block content %}
+
+<div class="flex flex-col items-center justify-center w-screen h-screen">
+    <header>
+        <h2>Select Payment Method</h2>
+    </header>
+    <hr>
+
+	<form class="max-w-screen-sm" action="{% url 'checkout-for-payment' address_id %}" method="post">
+		{% csrf_token %}
+		<div class="my-3">
+			<input class="hidden" id="radio-address" type="radio" name="payment" value="cod" />
+			<label class="flex flex-col p-4 border-2 border-gray-400 cursor-pointer" for="radio-address">
+				<span class="text-xl text-center font-semibold uppercase">Payment</span>
+				<span class="text-xl font-bold mt-2">Only COD is available</span>
+				
+			</label>
+		</div>
+        <button
+            class="border border-indigo-500 bg-indigo-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-indigo-600 focus:outline-none focus:shadow-outline">
+            Select Payment
+        </button>
+	</form>
+
+</div>
+{% endblock %}
