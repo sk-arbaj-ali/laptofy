@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1']
+ALLOWED_HOSTS = ['render.com']
 
 
 # Application definition
@@ -81,13 +81,17 @@ WSGI_APPLICATION = 'laptofy.wsgi.application'
 
 DATABASES = {
     'default': {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "ecommerce",
-        "USER": "root",
-        "PASSWORD": "arbaj",
-        "HOST": "127.0.0.1",
-        "PORT": "3306",
-    }
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / 'db.sqlite3',
+    },
+    # 'default': {
+    #     "ENGINE": "django.db.backends.mysql",
+    #     "NAME": "ecommerce",
+    #     "USER": "root",
+    #     "PASSWORD": "arbaj",
+    #     "HOST": "127.0.0.1",
+    #     "PORT": "3306",
+    # }
 }
 
 
