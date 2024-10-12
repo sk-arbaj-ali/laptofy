@@ -18,6 +18,7 @@ def create_user_account(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            login(request,user)
             messages.add_message(request, messages.SUCCESS, 'Account created successfully. Please go to login.')
             messages.add_message(request, messages.SUCCESS, 'Check your email for verification.')
 
@@ -38,13 +39,20 @@ def create_seller_user_account(request):
             user = form.save()
             user.is_seller = True
             user.save()
+            login(request,user)
             messages.add_message(request, messages.SUCCESS, 'Seller Account created. Please go to login.')
             messages.add_message(request, messages.SUCCESS, 'Check your email for verification.')
+
+            verification_url = settings.ALLOWED_HOSTS[0] + reverse('verify-user', kwargs={'token':str(user.verification_token)})
+            message = f'To verify your account, please click the link : {verification_url}'
+            send_verification_email(message, user.email)
+
             return render(request, 'accounts/create-user.html', {'form':form})
 
     return render(request, 'accounts/create-user.html', {'form':form})
 
 
+# @user_passes_test(test_func=is_user_verified, redirect_field_name=None, login_url='/verification-failed/')
 def login_handler(request):
     if request.method == 'GET':
         form = CustomAuthForm(request)
@@ -98,3 +106,17 @@ def verify_user(request, token=None):
         user.is_verified = True
         user.save()
         return redirect(reverse('home'))
+    
+
+@login_required
+def resend_verification_email(request):
+
+    if request.method == 'POST':
+        user = get_user(request)
+        if not user.is_verified:
+            verification_url = settings.ALLOWED_HOSTS[0] + reverse('verify-user', kwargs={'token':str(user.verification_token)})
+            message = f'To verify your account, please click the link : {verification_url}'
+            send_verification_email(message, user.email)
+            messages.add_message(request, messages.INFO, 'Email sent successfully.')
+            return render(request, 'base/verification.html')
+    return redirect(reverse('home'))

@@ -59,7 +59,7 @@ class ProductColorAndSizeForm(forms.Form):
 
 
 class ProductFilterForm(forms.Form):
-    product_category = forms.ModelChoiceField(queryset=Category.objects.none(),required=False)
+    product_category = forms.ModelChoiceField(queryset=SubCategory.objects.all(),required=False)
     display_sizes = forms.ChoiceField(choices={}, required=False)
     prices = forms.ChoiceField(choices={
         None:'----------',

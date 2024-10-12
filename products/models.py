@@ -55,7 +55,7 @@ class ProductSize(models.Model):
     color = models.ForeignKey(ProductColor, on_delete=models.CASCADE, related_name='sizes')
 
     def __str__(self):
-        return f'{self.size}'
+        return f'{self.size} inch'
 
 # class ProductColor(models.Model):
 #     name = models.CharField(max_length=50)

@@ -1,0 +1,77 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+  <div class='w-6/12 mx-auto mt-1'>
+    <div class="relative border border-gray-200 rounded-lg shadow-lg">
+      <button onClick='return this.parentNode.remove()'
+        class="absolute p-1 bg-gray-100 border border-gray-300 rounded-full -top-1 -right-1">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-3 h-3"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+    
+      <div class="flex items-center p-4">
+        <div class="ml-3 overflow-hidden">
+          <p class="font-medium text-gray-900">Message</p>
+          <p class="max-w-xs text-sm text-gray-500 truncate">
+            {{message}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+{% endif %}
+
+
+<div class="  w-full  sm:w-3/4 bg-white px-10 py-10">
+{% if not items %}
+    <p class="text-base font-black leading-none text-gray-800">No Product added 😐</p>
+{% endif %}
+{% for item in items %}
+    <div class="md:flex items-strech py-8 md:py-10 lg:py-8 border-t border-gray-50">
+        <div class="w-16">
+        {% if item.product_image.all %}
+            <img src="{{ item.product_image.first.image.url }}" alt="Black Leather Purse" class="object-center object-cover md:block hidden" />
+            <img src="{{ item.product_image.first.image.url }}" alt="Black Leather Purse" class="md:hidden object-center object-cover" />
+        {% else %}
+            <img src="" alt="Image not available" />
+        {% endif %}
+        </div>
+        <div class="md:pl-3 md:w-8/12 2xl:w-3/4 flex flex-col justify-center">
+        <!-- <p class="text-xs leading-3 text-gray-800 md:pt-0 pt-4">RF293</p> -->
+        <div class="flex items-center justify-between w-full">
+            <p class="text-base font-black leading-none text-gray-800">{{ item.name }}</p>
+            
+        </div>
+        <!-- <p class="text-xs leading-3 text-gray-600 pt-2">Height: 10 inches</p> -->
+        <!-- <p class="text-xs leading-3 text-gray-600 py-4">Color: {{item.color.name}}</p>
+        <p class="text-xs leading-3 text-gray-600 py-4">Size: {{item.size.size}}</p> -->
+        <!-- <p class="w-96 text-xs leading-3 text-gray-600">Composition: 100% calf leather</p> -->
+        <div class="flex items-center justify-between pt-5">
+            <div class="flex itemms-center">
+                <form action="{% url 'show-products-added-by-seller' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_slug" value="{{ item.slug }}">
+                    <input type="submit" value="Remove" class="bg-slate-500 text-white cursor-pointer px-3 py-2" />
+                </form>
+            </div>
+            <!-- <p class="text-base font-black leading-none text-gray-800">{{item.price}}</p> -->
+        </div>
+    </div>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}

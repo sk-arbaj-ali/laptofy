@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import get_user
 from accounts.utility import login_handler_for_seller, is_user_verified
 from django.conf import settings
+from django.contrib import messages
 
 # Create your views here.
 
@@ -147,30 +148,30 @@ def display_all_products(request):
         product = request.GET.get('product')
         queryset = Product.objects.filter(sub_category__category__name__iexact=product, colors__sizes__available_stock__gt=0).distinct()
         sub_category = SubCategory.objects.filter(category__name__iexact=product)
-        sizes = ProductSize.objects.filter(color__product__sub_category__category__name__iexact='laptops').values('size').distinct()
-        display_sizes = [('0', '------')]
+        sizes = ProductSize.objects.filter(color__product__sub_category__category__name__iexact=product).values('size').distinct()
+        display_sizes = [(None, '---------')]
         for item in sizes:
-            display_sizes.append((item['size'], item['size']))
+            display_sizes.append((item['size'], f"{item['size']} inch"))
         form = ProductFilterForm(sub_category, display_sizes)
-        return render(request, 'products/product-display.html', {'products':queryset, 'form':form})
+        return render(request, 'products/product-display.html', {'products':queryset, 'form':form, 'category':product})
     
     if request.method == 'POST':
-        product = request.GET.get('product')
-        queryset = Product.objects.filter(sub_category__category__name__iexact=product, colors__sizes__available_stock__gt=0).distinct()
-        sub_category = SubCategory.objects.filter(category__name__iexact=product)
-        sizes = ProductSize.objects.filter(color__product__sub_category__category__name__iexact=product).values('size').distinct()
-        display_sizes = [('0', '------')]
+        category = request.POST.get('category')
+        queryset = Product.objects.filter(sub_category__category__name__iexact=category, colors__sizes__available_stock__gt=0).distinct()
+        sub_category = SubCategory.objects.filter(category__name__iexact=category)
+        sizes = ProductSize.objects.filter(color__product__sub_category__category__name__iexact=category).values('size').distinct()
+        display_sizes = [(None, '---------')]
         for item in sizes:
-            display_sizes.append((item['size'], item['size']))
+            display_sizes.append((item['size'], f"{item['size']} inch"))
         form = ProductFilterForm(sub_category, display_sizes, request.POST)
         if form.is_valid():
             data = form.cleaned_data
             products = Product.objects.filter(
                 sub_category=data.get('product_category'),
-                colors__sizes__size=data.get('display_sizes')
+                colors__sizes__size=Decimal(data.get('display_sizes'))
             ).distinct()
 
-        return render(request, 'products/product-display.html', {'products':products, 'form':form})
+        return render(request, 'products/product-display.html', {'products':products, 'form':form, 'category':category})
         
 
 def search_products(request):
@@ -181,53 +182,85 @@ def search_products(request):
         search_data = request.POST.get('search')
         products = Product.objects.filter(name__icontains=search_data)
 
-        category = products[0].sub_category.category
-        sub_category = category.subcategory_set.all()
-        sizes = ProductSize.objects.filter(color__product__sub_category__category=category).values('size').distinct()
-        display_sizes = [('0', '------')]
+        category = request.POST.get('category')
+        sub_category = SubCategory.objects.filter(category__name__iexact=category)
+        sizes = ProductSize.objects.filter(color__product__sub_category__category__name__iexact=category).values('size').distinct()
+        display_sizes = [(None, '---------')]
         for item in sizes:
-            display_sizes.append((item['size'], item['size']))
+            display_sizes.append((item['size'], f"{item['size']} inch"))
         form = ProductFilterForm(sub_category, display_sizes)
 
-        return render(request, 'products/product-display.html', {'products':products, 'form':form})
+        return render(request, 'products/product-display.html', {'products':products, 'form':form, 'category':category})
     
 
 def filter_products(request):
     if request.method == 'POST':
-        sub_category = SubCategory.objects.all()
-        sizes = ProductSize.objects.values('size').distinct()
-        display_sizes = [('0', '------')]
+        category = request.POST.get('category')
+        sub_category = SubCategory.objects.filter(category__name__iexact=category)
+        sizes = ProductSize.objects.filter(color__product__sub_category__category__name__iexact=category).values('size').distinct()
+        display_sizes = [(None, '---------')]
         for item in sizes:
-            display_sizes.append((item['size'], item['size']))
+            display_sizes.append((item['size'], f"{item['size']} inch"))
         form = ProductFilterForm(sub_category, display_sizes, request.POST)
         if form.is_valid():
             data = form.cleaned_data
+            products = Product.objects.filter(colors__sizes__available_stock__gt=0).distinct()
+            # products = Product.objects.all()
             
             if data.get('product_category'):
                 products = Product.objects.filter(
                     sub_category=data.get('product_category')
                 )
 
-            if data.get('display_sizes') != '0':
-                products.filter(
+            if data.get('display_sizes'):
+                products = products.filter(
                     colors__sizes__size=Decimal(data.get('display_sizes')), 
                     colors__sizes__available_stock__gt=0
                 ).distinct()
 
             if data.get('prices'):
-                price = int(data.get('price'))
+                price = data.get('prices')
+                price = int(price)
+                lowPrice = price
+                highPrice = price + 20000
+                print(f'{lowPrice} type : {type(lowPrice)}')
+                print(f'{highPrice} type : {type(highPrice)}')
                 if price != 80000:
-                    products.filter(original_price__range=(price, price+20000))
+                    # print('price not 80000')
+                    products = products.filter(original_price__range=(lowPrice, highPrice))
                 else:
-                    products.filter(original_price__gte=80000)
+                    # print('price is 80000')
+                    products = products.filter(original_price__gte=80000)
 
             
-        category = products[0].sub_category.category
-        sub_category = category.subcategory_set.all()
-        sizes = ProductSize.objects.filter(color__product__sub_category__category=category).values('size').distinct()
-        display_sizes = [('0', '------')]
-        for item in sizes:
-            display_sizes.append((item['size'], item['size']))
-        form = ProductFilterForm(sub_category, display_sizes)
+        # category = products[0].sub_category.category
+        # sub_category = category.subcategory_set.all()
+        # sizes = ProductSize.objects.filter(color__product__sub_category__category=category).values('size').distinct()
+        # display_sizes = [('0', '------')]
+        # for item in sizes:
+        #     display_sizes.append((item['size'], item['size']))
+            form = ProductFilterForm(sub_category, display_sizes)
 
-        return render(request, 'products/product-display.html', {'products':products, 'form':form})
+        return render(request, 'products/product-display.html', {'products':products, 'form':form, 'category':category})
+    
+
+@login_required
+@user_passes_test(test_func=is_user_verified, redirect_field_name=None, login_url='/verification-failed/')
+@user_passes_test(test_func=login_handler_for_seller, login_url=f"{settings.LOGIN_URL}?seller=0")
+def show_products_added_by_seller(request):
+    if request.method == 'GET':
+        user = get_user(request)
+        items = Product.objects.filter(user=user)
+    if request.method == 'POST':
+        user = get_user(request)
+        product_slug = request.POST.get('product_slug')
+        try:
+            product = Product.objects.get(slug=product_slug, user=user)
+            product.delete() 
+            messages.add_message(request, messages.INFO, 'The product deleted successfully.')  
+        except:
+            messages.add_message(request, messages.INFO, "Can't find the product")  
+
+        items = Product.objects.filter(user=user)
+
+    return render(request, 'products/products-added-by-user.html', {'items':items})

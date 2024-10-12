@@ -4,6 +4,7 @@
 <div class="search-bar my-3 flex justify-center">
     <form action="{% url 'search-products' %}" class="flex my-6" method="post">
         {% csrf_token %}
+        <input type="hidden" name="category" value="{{ category }}" />
         <input name="search" type="text" placeholder="search products..."
         class=" px-4 py-2 rounded-l-lg bg-slate-700 focus:bg-slate-800 focus:text-slate-300 text-slate-400 placeholder-slate-400 focus:ring-0 focus:outline-none border" />
         <button type="submit" class="px-4 py-2 text-sm font-bold uppercase bg-blue-600 rounded-r-lg text-slate-300 active:bg-blue-800 border">
@@ -13,8 +14,9 @@
 </div>
 <div class="product-display">
     <div class="sidebar">
-        <form action="{% url 'apply-filters' %}" method="post" class="flex justify-center items-center">
+        <form action="{% url 'apply-filters' %}" method="post" class="flex flex-row justify-center items-center md:flex-col md:items-start">
             {% csrf_token %}
+            <input type="hidden" name="category" value="{{ category }}" />
             {{ form }}
             <button class="px-6 py-2 min-w-[120px] text-center bg-violet-600 border border-violet-600 rounded hover:bg-transparent focus:outline-none focus:ring">Add Filter</button>
         </form>
